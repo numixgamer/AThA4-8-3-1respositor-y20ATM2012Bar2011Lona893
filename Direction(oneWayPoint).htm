@@ -1,0 +1,129 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <style type="text/css">
+        html {
+            height: 100%;
+        }
+
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        #map-canvas {
+            height: 100%;
+        }
+
+        #control {
+            position: absolute;
+            top: 5px;
+            left: 50%;
+            margin-left: -180px;
+            z-index: 5;
+            background-color: #fff;
+            padding: 5px;
+            border: 1px solid #999;
+            overflow-y: scroll;
+            max-height: 50px;
+        }
+    </style>
+    <script type="text/javascript"
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDlOA0kfEdoq8TnAZl7K1XBgBsAKRopbYY">
+
+    </script>
+    <script type="text/javascript">
+        var a = 1;
+        var i = 1;
+        var s = 0;
+        var start;
+        var end;
+        var directionsDisplay;
+        var directionsService = new google.maps.DirectionsService();
+        function initialize() {
+            directionsDisplay = new google.maps.DirectionsRenderer
+            var mapOptions = {
+                center: new google.maps.LatLng(38.054963128482484, 46.258336300969646),
+                zoom: 5,
+            };
+            var map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
+            directionsDisplay.setMap(map);
+            /*google.maps.event.addDomListener(map, 'dblclick', function (e) {
+                var Position = e.latLng;
+                //input.innerHTML = Position;
+                input.innerText += Position + "\n";
+                var data = {
+                    position: Position,
+                    map,
+                    title: a
+                }
+                const marker = new google.maps.Marker(data);
+                //alert(a)
+                a++;
+            });*/
+            google.maps.event.addDomListener(map, 'dblclick', function (e) {
+                try {
+                    var pts = e.latLng;
+                    var waypts = [];
+                    var data = { position: pts, map }
+
+                    //If
+                    if (i == 1) {
+                        start = pts;
+                        const marker = new google.maps.Marker(data);
+                    }
+                    //End If
+
+
+                    //Else If 2
+                    else if (i == 2) {
+                        end = pts;
+                        const marker = new google.maps.Marker(data);
+                        var request = { origin: start, destination: end, travelMode: google.maps.TravelMode.DRIVING, waypoints:waypts };
+                        directionsService.route(request, function (response, status) {
+                            if (status == google.maps.DirectionsStatus.OK) {
+                                directionsDisplay.setDirections(response)
+                                //marker.setMap(null);
+                            }
+                            else { alert('There Is A Problam'); }
+                        });
+                    }
+                    //End Else If 2
+
+                    //Else If
+                    else {
+                        //var waypts = [];
+                        waypts.push({ location: pts, stopover: true });
+                        /*waypts.push({
+                            location: pts,
+                            stopover: true
+                        });*/
+                        //points.value += "{ location:"+ pts+", stopover: true }" + "|"; 
+                        //var waypts = points.value.split("|");
+                        const marker = new google.maps.Marker(data);
+                        var request = { origin: start, destination: end, travelMode: google.maps.TravelMode.DRIVING, waypoints: waypts };
+                        directionsService.route(request, function (response, status) {
+                            if (status == google.maps.DirectionsStatus.OK) {
+                                directionsDisplay.setDirections(response)
+                                //marker.setMap(null);
+                            }
+                            else { alert('There Is A Problam'); }
+                        });                        
+                    }
+                    //End Else If
+                    i++;
+                }
+                catch (ex) { alert(ex);}
+            });
+        }
+        google.maps.event.addDomListener(window, 'load', initialize);
+    </script>
+</head>
+<body>
+    <div id="control" style="position:absolute"><label id="input"></label></div>
+    <div id="map-canvas"></div>
+    <input type="text" value="" id="points" />
+</body>
+</html>
